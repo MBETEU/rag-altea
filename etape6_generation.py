@@ -27,7 +27,7 @@ Question: {question}
 Réponse:"""
     return prompt
 
-def repondre(question, k=3):
+def repondre(question, k=5):
     extraits = rechercher(question, k)
     prompt = construire_prompt(question, extraits)
     
@@ -39,7 +39,7 @@ def repondre(question, k=3):
     return reponse.choices[0].message.content, extraits
 
 if __name__ == "__main__":
-    q = "Combien de jours de télétravail par semaine sont autorisés ?"
+    q = "Quel est le plafond des notes de frais pour les repas ?"
     print(f"Question : {q}\n")
     reponse, extraits = repondre(q)
     print("--- RÉPONSE DU RAG ---")
