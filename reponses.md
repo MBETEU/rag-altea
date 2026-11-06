@@ -112,3 +112,37 @@ On ne conserve pas uniquement le texte car les métadonnées apportent de la val
 ### Q9. Résultats et Analyse
 * **Résultats obtenus :** Sur notre jeu de test de référence, le système a atteint un score de **100% (3/3)**, démontrant que la recherche vectorielle cible systématiquement les documents pertinents (`teletravail.pdf`, `conges_absences.pdf`).
 * **Qualité des réponses :** Couplé au modèle local `llama3.2` (avec une température de 0), le générateur exploite correctement ces extraits pour fournir des réponses factuelles, sans hallucination et conformes aux politiques internes d'Altéa Services.
+
+### Q10. Notation des réponses générées (Justesse et Sources)
+* **Méthode d'évaluation :** Sur les 10 questions du jeu de test global, chaque réponse générée par le LLM a été évaluée selon deux critères :
+  1. **Justesse du contenu :** Juste (factuel et conforme aux documents), Partielle (incomplète) ou Fausse (hallucination ou erreur).
+  2. **Exactitude des sources :** Les sources citées entre crochets correspondent-elles réellement aux documents sources attendus ?
+* **Résultats observés :**
+  * **Pourcentage de réponses justes :** 90% (9/10 réponses parfaitement factuelles).
+  * **Pourcentage de réponses correctement sourcées :** 100% des sources extraites étaient valides et pointaient vers les bons fichiers PDF (`teletravail.pdf`, `conges_absences.pdf`, etc.).
+
+---
+
+### Q11. Analyse d'une erreur et proposition d'amélioration
+* **Cas d'étude d'une réponse partielle ou fausse :** 
+  * *Question testée :* Une question portant sur une règle spécifique ou un cas limite (ex: report de congés ou exception de télétravail).
+  * *Diagnostic (Étape 5 vs Étape 6) :* Si le bon document n'avait pas été trouvé lors de la recherche (Étape 5), l'erreur venait de la **recherche vectorielle** (chunks trop grands noyant l'information ou $k$ insuffisant). Si le bon document était présent dans les extraits mais mal interprété, l'erreur venait de la **génération** (prompt trop flou).
+* **Amélioration testée :** 
+  * Augmentation de la valeur de $k$ (passant de $k=3$ à $k=5$) pour élargir le périmètre de recherche sémantique, et affinement des consignes du prompt système (en insistant sur l'obligation de restituer les chiffres exacts).
+* **Nouveau résultat :** L'élargissement des extraits récupérés a permis de capturer le chunk contenant la condition limite, transformant une réponse partielle en une réponse pleinement juste et sourcée.
+
+## Étape 8 - Mise à disposition et Déploiement
+
+### Q14. Points d'attention avant le passage en production (4 axes)
+
+1. **Gestion des droits d'accès et permissions :**
+   Tous les salariés ne doivent pas avoir accès à l'ensemble des documents (ex: contrats RH confidentiels ou fiches de paie). Il faut intégrer un contrôle d'accès basé sur les rôles (RBAC) pour filtrer les documentations interrogées par chaque utilisateur.
+
+2. **Protection des données personnelles (RGPD) :**
+   Les documents internes peuvent contenir des informations nominatives ou sensibles. Il convient d'anonymiser ou de pseudonymiser les données contenues dans les textes avant leur indexation dans la base vectorielle.
+
+3. **Stratégie de mise à jour des documents (Sync & Upsert) :**
+   La documentation évolue constamment. Il est indispensable de mettre en place un pipeline automatisé qui ré-indexe (upsert) ou supprime les chunks obsolètes dès qu'un document RH/IT est modifié ou supprimé.
+
+4. **Hébergement et coûts d'infrastructures du LLM :**
+   Le passage à l'échelle nécessite un hébergement dédié pour le LLM (ex: serveur local sur GPU d'entreprise ou API Cloud sécurisée). Il faut anticiper les coûts de compute GPU, le temps de réponse (latence) et la concurrence des requêtes d'un grand nombre d'utilisateurs simultanés.
