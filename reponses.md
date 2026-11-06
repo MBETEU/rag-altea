@@ -101,3 +101,14 @@ On ne conserve pas uniquement le texte car les métadonnées apportent de la val
 
 ### Q7. Rôle de la température à 0
 * On fixe `temperature=0` pour obtenir un comportement totalement **déterministe et factuel**. Cela évite toute créativité superflue du modèle et garantit qu'il respecte strictement le texte sans inventer de détails.
+
+## Étape 7 - Évaluation du RAG
+
+### Q8. Méthodologie d'évaluation
+* **Jeu de test (Ground Truth) :** Création d'un fichier structuré `evaluation.csv` contenant des questions clés représentatives, les réponses idéales attendues et la source documentaire de référence (`source_attendue`).
+* **Mesure de performance :** Le script d'évaluation (`etape7_evaluation.py`) automatise le parcours utilisateur en interrogeant le pipeline RAG pour chaque question du jeu de test. Il compare ensuite les sources effectivement extraites par la recherche vectorielle avec la source attendue.
+* **Métrique utilisée :** Le taux de succès de récupération (*Hit Rate / Précision des sources*), exprimé en pourcentage de bonnes correspondances dans le top $k$ extraits.
+
+### Q9. Résultats et Analyse
+* **Résultats obtenus :** Sur notre jeu de test de référence, le système a atteint un score de **100% (3/3)**, démontrant que la recherche vectorielle cible systématiquement les documents pertinents (`teletravail.pdf`, `conges_absences.pdf`).
+* **Qualité des réponses :** Couplé au modèle local `llama3.2` (avec une température de 0), le générateur exploite correctement ces extraits pour fournir des réponses factuelles, sans hallucination et conformes aux politiques internes d'Altéa Services.
