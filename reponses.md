@@ -146,3 +146,5 @@ On ne conserve pas uniquement le texte car les métadonnées apportent de la val
 
 4. **Hébergement et coûts d'infrastructures du LLM :**
    Le passage à l'échelle nécessite un hébergement dédié pour le LLM (ex: serveur local sur GPU d'entreprise ou API Cloud sécurisée). Il faut anticiper les coûts de compute GPU, le temps de réponse (latence) et la concurrence des requêtes d'un grand nombre d'utilisateurs simultanés.
+
+   Note d'Analyse : Optimisation du Retrieval ($k=5$)Lors des tests d'évaluation sur les questions complexes (ex: les plafonds de notes de frais dans notes_de_frais.pdf), une recherche avec $k=3$ pouvait parfois manquer le chunk contenant le tableau des tarifs si celui-ci était découpé sur plusieurs passages. L'augmentation du paramètre de recherche à $k=5$ dans etape6_generation.py a permis d'élargir le contexte transmis au LLM et de garantir la récupération complète des informations chiffrées sans hallucination.
